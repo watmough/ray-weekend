@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <iostream>
 
-
 class vec3 {
     public:
         vec3() {}
@@ -35,7 +34,6 @@ class vec3 {
 
         float e[3];
 };
-
 
 inline std::istream& operator>>(std::istream &is, vec3 &t) {
     is >> t.e[0] >> t.e[1] >> t.e[2];
