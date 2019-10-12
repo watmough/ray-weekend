@@ -1,3 +1,6 @@
+#ifndef VEC3HPP
+#define VEC3HPP
+
 #include <math.h>
 #include <stdlib.h>
 #include <iostream>
