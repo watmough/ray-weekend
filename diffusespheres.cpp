@@ -14,7 +14,7 @@ vec3 random_in_unit_sphere() {
 
 vec3 color(const ray& r,hitable* world) {
     hit_record rec;
-    if (world->hit(r,0.0,MAXFLOAT,rec)) {
+    if (world->hit(r,0.001,MAXFLOAT,rec)) {
         vec3 target=rec.p+rec.normal+random_in_unit_sphere();
         return 0.5f*color(ray(rec.p,target-rec.p),world);
     }
@@ -27,7 +27,7 @@ vec3 color(const ray& r,hitable* world) {
 int main() {
     int nx=1600;
     int ny=800;
-    int ns=20;
+    int ns=100;
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
     hitable *list[2];
     list[0]=new sphere(vec3(0,0,-1),0.5);
