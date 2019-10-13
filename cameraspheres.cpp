@@ -29,12 +29,13 @@ int main() {
     int ny=800;
     int ns=50;
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
-    hitable *list[2];
-    float R=cos(M_PI/4.0f);
-    camera cam(90,float(nx)/float(ny));
-    list[0]=new sphere(vec3(-R,0.0f,-1.f),R,new lambertian(vec3(0.f,0.f,1.f)));
-    list[1]=new sphere(vec3(R,0.f,-1.f),R,new lambertian(vec3(1.f,0.f,0.f)));
-    hitable *world=new hitable_list(list,2);
+    camera cam(vec3(-2.f,1.f,1.f),vec3(0.f,0.f,-1.f),vec3(0.f,1.f,0.f),90,float(nx)/float(ny));
+    hitable *list[4];
+    list[0]=new sphere(vec3(0.0f,0.0f,-1.0f),0.5,new lambertian(vec3(0.8,0.3,0.3)));
+    list[1]=new sphere(vec3(0,-100.5,-1),100,new lambertian(vec3(0.8,0.8,0.0)));
+    list[2]=new sphere(vec3(1.0,0.0,-1.0),0.5,new metal(vec3(0.8,0.6,0.2),0.01));
+    list[3]=new sphere(vec3(-1.0,0.0,-1.0),0.5,new glass(1.5));
+    hitable *world=new hitable_list(list,4);
 
     for (int j=ny-1; j>=0; j--) {
         for (int i=0; i<nx; i++) {
