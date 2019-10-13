@@ -29,7 +29,13 @@ int main() {
     int ny=800;
     int ns=50;
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
-    camera cam(vec3(-2.f,1.f,1.f),vec3(0.f,0.f,-1.f),vec3(0.f,1.f,0.f),90,float(nx)/float(ny));
+
+    // setup camera
+    vec3 lookfrom(3,3,2);
+    vec3 lookat(0,0,-1);
+    float focus_distance=(lookfrom-lookat).length();
+    float aperture=1.f;
+    camera cam(lookfrom,lookat,vec3(0.f,1.f,0.f),20,float(nx)/float(ny),aperture,focus_distance);
     hitable *list[4];
     list[0]=new sphere(vec3(0.0f,0.0f,-1.0f),0.5,new lambertian(vec3(0.8,0.3,0.3)));
     list[1]=new sphere(vec3(0,-100.5,-1),100,new lambertian(vec3(0.8,0.8,0.0)));
