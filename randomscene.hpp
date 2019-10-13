@@ -19,12 +19,12 @@ hitable * random_scene() {
             float choose_mat=drand48();
             vec3 center(a+0.9f*drand48(),0.2,b+0.9*drand48());
             if ((center-vec3(4,0.2,0)).length()>0.9) {
-                if (choose_mat<0.8) { // diffuse 
+                if (choose_mat<0.6) { // diffuse 
                     list[i++]=new sphere(center,0.2,new lambertian(vec3(drand48()*drand48(),drand48()*drand48(),drand48()*drand48())));
-                } else if (choose_mat<0.95) { // metal
-                    list[i++]=new sphere(center,0.2,new metal(vec3(0.5*(1+drand48()),0.5*(1+drand48()),0.5*(1+drand48())),0.5*drand48()));
+                } else if (choose_mat<0.75) { // metal
+                    list[i++]=new sphere(center,0.2,new metal(vec3(0.2*(1+drand48()),0.5*(1+drand48()),0.5*(1+drand48())),0.5*drand48()));
                 } else {
-                    list[i++]=new sphere(center,0.2f,new glass(1.5));
+                    list[i++]=new sphere(center,0.2f,new glass(1.1));
                 }
             }
         }
