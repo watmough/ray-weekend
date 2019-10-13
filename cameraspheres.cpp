@@ -6,6 +6,7 @@
 #include "hitablelist.hpp"
 #include "float.h"
 #include "camera.hpp"
+#include "randomscene.hpp"
 
 vec3 color(const ray& r,hitable* world,int depth) {
     hit_record rec;
@@ -31,17 +32,19 @@ int main() {
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 
     // setup camera
-    vec3 lookfrom(3,3,2);
-    vec3 lookat(0,0,-1);
+    vec3 lookfrom(2,1,5);
+    vec3 lookat(0,0,-2);
     float focus_distance=(lookfrom-lookat).length();
-    float aperture=1.f;
-    camera cam(lookfrom,lookat,vec3(0.f,1.f,0.f),20,float(nx)/float(ny),aperture,focus_distance);
-    hitable *list[4];
-    list[0]=new sphere(vec3(0.0f,0.0f,-1.0f),0.5,new lambertian(vec3(0.8,0.3,0.3)));
-    list[1]=new sphere(vec3(0,-100.5,-1),100,new lambertian(vec3(0.8,0.8,0.0)));
-    list[2]=new sphere(vec3(1.0,0.0,-1.0),0.5,new metal(vec3(0.8,0.6,0.2),0.01));
-    list[3]=new sphere(vec3(-1.0,0.0,-1.0),0.5,new glass(1.5));
-    hitable *world=new hitable_list(list,4);
+    float aperture=0.01f;
+    float fov=50;
+    camera cam(lookfrom,lookat,vec3(0.f,1.f,0.f),fov,float(nx)/float(ny),aperture,focus_distance);
+    // hitable *list[4];
+    // list[0]=new sphere(vec3(0.0f,0.0f,-1.0f),0.5,new lambertian(vec3(0.8,0.3,0.3)));
+    // list[1]=new sphere(vec3(0,-100.5,-1),100,new lambertian(vec3(0.8,0.8,0.0)));
+    // list[2]=new sphere(vec3(1.0,0.0,-1.0),0.5,new metal(vec3(0.8,0.6,0.2),0.01));
+    // list[3]=new sphere(vec3(-1.0,0.0,-1.0),0.5,new glass(1.5));
+    // hitable *world=new hitable_list(list,4);
+    hitable *world=random_scene();
 
     for (int j=ny-1; j>=0; j--) {
         for (int i=0; i<nx; i++) {
