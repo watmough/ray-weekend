@@ -8,8 +8,6 @@
 #include "camera.hpp"
 #include "randomscene.hpp"
 
-#include <omp.h>
-
 vec3 color(const ray& r,hitable* world,int depth) {
     hit_record rec;
     if (world->hit(r,0.001,MAXFLOAT,rec)) {
