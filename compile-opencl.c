@@ -8,27 +8,12 @@
 #include <CL/opencl.h>
 #endif
 
-// const char *KernelSource =
-//     "__kernel void square(__global float* input, __global float* output, const unsigned int count) { \n" \
-//     "   int i = get_global_id(0);                                                                    \n" \
-//     "   if(i < count) { output[i] = input[i] * input[i]; }                                           \n" \
-//     "}";
-
-// compile an opencl kernel
-int main(int argc, char **argv) {
-    // check usage
-    if (argc==2) {
-        printf("compiling file: %s\n",argv[1]);
-    } else {
-        printf("usage: %s file\n",argv[0]);
-        printf("checks if the passed kernel can be compiled.\n");
-        exit(-1);
-    }
-
+// read kernel from file
+char* readkernel(char *filename) {
     // load the kernel source
-    FILE *f=fopen(argv[1],"r");
+    FILE *f=fopen(filename,"r");
     if (!f) {
-        printf("Error: unable to open file: %s\n",argv[1]);
+        printf("Error: unable to open file: %s\n",filename);
         exit(-2);
     }
     int ret=fseek(f,0,SEEK_END);
@@ -39,7 +24,7 @@ int main(int argc, char **argv) {
     size_t len=ftell(f);
     void *KernelSource=malloc(len);
     if (!f || !len || !KernelSource) {
-        printf("Error: bad file: %s or len: %ld or buffer: %p\n",argv[1],len,KernelSource);
+        printf("Error: bad file: %s or len: %ld or buffer: %p\n",filename,len,KernelSource);
         exit(-2);
     } else {
         printf("file is %ld bytes\n",len);
@@ -51,37 +36,57 @@ int main(int argc, char **argv) {
         exit(-1);
     }
     fclose(f);
+    return KernelSource;
+}
+
+typedef struct tag_opencl {
+    cl_platform_id      platform_id;
+    cl_device_id        device_id;
+    cl_context          context;
+} opencl;
+
+// initialize an opencl context
+int get_opencl_context(opencl** pocl) {
+    // allocate an ocl struct
+    opencl *ocl=(*pocl=(opencl *)malloc(sizeof(opencl)));
+    if (!ocl) {
+        printf("Error: failed to allocate an opencl struct\n");
+        exit(-1);
+    }
+
+    // get platform id
+    int err=0;
 
     // try and find a GPU
-    int err;
-    cl_device_id device_id;
-    if ((err=clGetDeviceIDs(NULL, CL_DEVICE_TYPE_GPU, 1, &device_id, NULL))==CL_SUCCESS) {
-        printf("device_id: %ld\n",(long)device_id);
+    if ((err=clGetDeviceIDs(NULL, CL_DEVICE_TYPE_CPU/*GPU*/, 1, &ocl->device_id, NULL))==CL_SUCCESS) {
+        printf("device_id: %ld\n",(long)ocl->device_id);
     } else {
         printf("Error: clGetDeviceIDs returned %ld\n",(long)err);
         exit(err);
     }
 
     // create a context
-    cl_context context = clCreateContext(0, 1, &device_id, NULL, NULL, &err);
+    ocl->context = clCreateContext(0, 1, &ocl->device_id, NULL, NULL, &err);
     if (err==CL_SUCCESS) {
         printf("got a cl_context.\n");
     } else {
         printf("Error: clCreateContext returned %ld\n",(long)err);
         exit(err);
     }
+    return err;
+};
 
-    // create a command queue
-    cl_command_queue commands = clCreateCommandQueue(context, device_id, 0, &err);
-    if (err==CL_SUCCESS) {
-        printf("got a cl_command_queue.\n");
-    } else {
-        printf("Error: clCreateCommandQueue returned %ld\n",(long)err);
-        exit(err);
-    }
+// dispose the the convenience struct and unref cl_context
+void dispose_opencl_context(opencl *ocl) {
+    clReleaseContext(ocl->context);
+    free(ocl);
+}
 
+// compile an opencl kernel and return the resulting handle
+cl_program compilekernel(opencl* ocl, char *KernelSource) {
     // create our program
-    cl_program program = clCreateProgramWithSource(context, 1, (const char **) &KernelSource, NULL, &err);
+    int err=0;
+    cl_program program = clCreateProgramWithSource(ocl->context, 1, (const char **) &KernelSource, NULL, &err);
     if (err==CL_SUCCESS) {
         printf("got a cl_program\n");
     } else {
@@ -100,13 +105,13 @@ int main(int argc, char **argv) {
         if (err == CL_BUILD_PROGRAM_FAILURE) {
             // Determine the size of the log
             size_t log_size;
-            clGetProgramBuildInfo(program, device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
+            clGetProgramBuildInfo(program, ocl->device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
 
             // Allocate memory for the log
             char *log = (char *) malloc(log_size);
 
             // Get the log
-            clGetProgramBuildInfo(program, device_id, CL_PROGRAM_BUILD_LOG, log_size, log, NULL);
+            clGetProgramBuildInfo(program, ocl->device_id, CL_PROGRAM_BUILD_LOG, log_size, log, NULL);
 
             // Print the log
             printf("Build log:\n%s\n", log);
@@ -114,82 +119,36 @@ int main(int argc, char **argv) {
         exit(err);
     }
 
-    // // create a kernel
-    // cl_kernel kernel = clCreateKernel(program, "square", &err);
-    // if (err==CL_SUCCESS) {
-    //     printf("got a kernel.\n");
-    // } else {
-    //     printf("Error: clCreateKernel returned %ld\n",(long)err);
-    //     exit(err);
-    // }
-
-    // // create buffers
-    // cl_mem input = clCreateBuffer(context,  CL_MEM_READ_ONLY,  sizeof(float) * DATA_SIZE, NULL, NULL);
-    // cl_mem output = clCreateBuffer(context, CL_MEM_WRITE_ONLY, sizeof(float) * DATA_SIZE, NULL, NULL);
-
-    // // create some data
-    // float *data = malloc(DATA_SIZE*sizeof(float));
-    // for (int i = 0; i < DATA_SIZE; i++) { 
-    //     data[i] = i; 
-    // }
-
-    // // write the data to the gpu
-    // err = clEnqueueWriteBuffer(commands, input, CL_TRUE, 0, sizeof(float) * DATA_SIZE, data, 0, NULL, NULL);
-
-    // // set up args to be passed into the kernel
-    // clSetKernelArg(kernel, 0, sizeof(cl_mem), &input);
-    // clSetKernelArg(kernel, 1, sizeof(cl_mem), &output);
-    // unsigned int count = DATA_SIZE;
-    // clSetKernelArg(kernel, 2, sizeof(unsigned int), &count);
-
-    // // query the work group size for this device_id
-    // size_t local;
-    // if ((err=clGetKernelWorkGroupInfo(kernel, device_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(local), &local, NULL))==CL_SUCCESS) {
-    //     printf("clGetKernelWorkGroupInfo: KERNEL_WORK_GROUP_SIZE: %ld.\n",(long)local);
-    // } else {
-    //     printf("Error: clGetKernelWorkGroupInfo returned %ld\n",(long)err);
-    //     exit(err);
-    // }
-
-    // // set the total count (global) and work group size (local) and queue the kernel for execution
-    // size_t global = count;
-    // if( (err=clEnqueueNDRangeKernel(commands, kernel, 1, NULL, &global, &local, 0, NULL, NULL))==CL_SUCCESS) {
-    //     printf("enqueued the kernel.\n");
-    // } else {
-    //     printf("Error: clEnqueueNDRangeKernel returned %ld\n",(long)err);
-    //     exit(err);
-    // }
-
-    // // wait for device to complete - sync
-    // if ((err=clFinish(commands))==CL_SUCCESS) {
-    //     printf("commands in queue completed.\n");
-    // } else {
-    //     printf("Error: clFinish returned %ld\n",(long)err);
-    //     exit(err);
-    // }
-
-    // // read the computed data
-    // float results[DATA_SIZE];
-    // clEnqueueReadBuffer(commands, output, CL_TRUE, 0, sizeof(float) * count, results, 0, NULL, NULL);
-
-    // // check the data
-    // unsigned int correct = 0;
-    // for (int i = 0; i < count; i++) {
-    //     if (results[i]==data[i]*data[i]) { 
-    //         correct++; 
-    //     }
-    // }
-    // printf("Computed '%d/%d' correct values!\n", correct, count);
-    
-    // cleanup
-    // free(data);
-    // clReleaseMemObject(input);
-    // clReleaseMemObject(output);
-    // clReleaseKernel(kernel);
-    free(KernelSource);
-    clReleaseProgram(program);
-    clReleaseCommandQueue(commands);
-    clReleaseContext(context);
-    return 0;
+    // return  the program
+    return program;
 }
 
+#ifdef MAKE_COCL
+// compile an opencl kernel
+int main(int argc, char **argv) {
+    // check usage
+    if (argc==2) {
+        printf("compiling file: %s\n",argv[1]);
+    } else {
+        printf("usage: %s file\n",argv[0]);
+        printf("checks if the passed kernel can be compiled.\n");
+        exit(-1);
+    }
+
+    // get a context
+    opencl *ocl=NULL;
+    int err=get_opencl_context(&ocl);
+
+    // load the kernel source
+    void *KernelSource=readkernel(argv[1]);
+
+    // create our program
+    cl_program program = compilekernel(ocl,KernelSource);
+
+    // cleanup
+    free(KernelSource);
+    clReleaseProgram(program);
+    dispose_opencl_context(ocl);
+    return 0;
+}
+#endif

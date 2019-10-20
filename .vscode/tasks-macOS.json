@@ -4,11 +4,11 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build day_16.cpp",
+            "label": "build basicsky_opencl",
             "type": "shell",
             "command": "clang",
             "args": [
-                "day_16.cpp -g -std=c++14 -stdlib=libc++ -lc++  -o day_16"
+                "basicsky_opencl.c -g -O0 -framework OpenCL -o basicsky_opencl"
             ],
             "group": {
                 "kind": "build",

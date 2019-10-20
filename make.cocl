@@ -1,0 +1,1 @@
+clang -DMAKE_COCL -g -O0 -framework OpenCL compile-opencl.c -o cocl

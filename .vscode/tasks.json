@@ -6,8 +6,9 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "g++ -g -std=c++14 -fpermissive '${relativeFile}' -o a.exe",
+//            "command": "g++ -g -std=c++14 -fpermissive '${relativeFile}' -o a.exe",
 //            "command": "clang++ -g -O3 -std=c++14 '${relativeFile}' -o a.out",
+            "command": "clang -g -O0 -framework OpenCL '${relativeFile}' -o '${fileBasenameNoExtension}'",
             "problemMatcher": {
                 "owner": "cpp",
                 "fileLocation": [

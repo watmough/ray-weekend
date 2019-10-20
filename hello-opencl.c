@@ -35,15 +35,6 @@ int main(void) {
         exit(err);
     }
 
-    // create a command queue
-    cl_command_queue commands = clCreateCommandQueue(context, device_id, 0, &err);
-    if (err==CL_SUCCESS) {
-        printf("got a cl_command_queue.\n");
-    } else {
-        printf("Error: clCreateCommandQueue returned %ld\n",(long)err);
-        exit(err);
-    }
-
     // create our program
     cl_program program = clCreateProgramWithSource(context, 1, (const char **) & KernelSource, NULL, &err);
     if (err==CL_SUCCESS) {
@@ -95,6 +86,15 @@ int main(void) {
     float *data = malloc(DATA_SIZE*sizeof(float));
     for (int i = 0; i < DATA_SIZE; i++) { 
         data[i] = i; 
+    }
+
+    // create a command queue
+    cl_command_queue commands = clCreateCommandQueue(context, device_id, 0, &err);
+    if (err==CL_SUCCESS) {
+        printf("got a cl_command_queue.\n");
+    } else {
+        printf("Error: clCreateCommandQueue returned %ld\n",(long)err);
+        exit(err);
     }
 
     // write the data to the gpu

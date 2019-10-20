@@ -1,0 +1,1 @@
+clang -g -O0 -framework OpenCL basicsky_opencl.c -o basicsky_opencl

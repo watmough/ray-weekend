@@ -12,5 +12,8 @@ cameraspheres
 cameraspheres
 cameraspheres.dSYM
 cocl
-cocl.dSYM
-hello-opencl.dSYM
+cocl.dSYM/
+hello-opencl.dSYM/
+*dSYM/
+hello-opencl
+basicsky_opencl
