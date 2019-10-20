@@ -1,0 +1,20 @@
+{
+    "files.associations": {
+        "ostream": "cpp",
+        "xstring": "cpp",
+        "string": "cpp",
+        "ios": "cpp",
+        "iosfwd": "cpp",
+        "type_traits": "cpp",
+        "xutility": "cpp",
+        "utility": "cpp",
+        "chrono": "cpp",
+        "iostream": "cpp",
+        "sstream": "cpp",
+        "bitset": "cpp",
+        "xlocale": "cpp",
+        "xlocmon": "cpp",
+        "ray.hpp": "c",
+        "stdlib.h": "c"
+    }
+}

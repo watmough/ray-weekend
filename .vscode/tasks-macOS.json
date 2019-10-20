@@ -1,0 +1,19 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build day_16.cpp",
+            "type": "shell",
+            "command": "clang",
+            "args": [
+                "day_16.cpp -g -std=c++14 -stdlib=libc++ -lc++  -o day_16"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
