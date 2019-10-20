@@ -8,12 +8,11 @@
 #include <CL/opencl.h>
 #endif
 
-#define DATA_SIZE (1024*1024)
-const char *KernelSource =
-    "__kernel void square(__global float* input, __global float* output, const unsigned int count) { \n" \
-    "   int i = get_global_id(0);                                                                    \n" \
-    "   if(i < count) { output[i] = input[i] * input[i]; }                                           \n" \
-    "}";
+// const char *KernelSource =
+//     "__kernel void square(__global float* input, __global float* output, const unsigned int count) { \n" \
+//     "   int i = get_global_id(0);                                                                    \n" \
+//     "   if(i < count) { output[i] = input[i] * input[i]; }                                           \n" \
+//     "}";
 
 // compile an opencl kernel
 int main(int argc, char **argv) {
@@ -38,19 +37,20 @@ int main(int argc, char **argv) {
         exit(ret);
     }
     size_t len=ftell(f);
-    void *buffer=malloc(len);
-    if (!f || !len || !buffer) {
-        printf("Error: bad file: %s or len: %ld or buffer: %p\n",argv[1],len,buffer);
+    void *KernelSource=malloc(len);
+    if (!f || !len || !KernelSource) {
+        printf("Error: bad file: %s or len: %ld or buffer: %p\n",argv[1],len,KernelSource);
         exit(-2);
     } else {
         printf("file is %ld bytes\n",len);
     }
     fseek(f,0,SEEK_SET);
     size_t count;
-    if (len!=(count=fread(buffer,1,len,f))) {
+    if (len!=(count=fread(KernelSource,1,len,f))) {
         printf("Error: unable to read %ld bytes, got %ld\n",len,count);
         exit(-1);
     }
+    fclose(f);
 
     // try and find a GPU
     int err;
@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
     }
 
     // create our program
-    cl_program program = clCreateProgramWithSource(context, 1, (const char **) & KernelSource, NULL, &err);
+    cl_program program = clCreateProgramWithSource(context, 1, (const char **) &KernelSource, NULL, &err);
     if (err==CL_SUCCESS) {
         printf("got a cl_program\n");
     } else {
@@ -186,7 +186,7 @@ int main(int argc, char **argv) {
     // clReleaseMemObject(input);
     // clReleaseMemObject(output);
     // clReleaseKernel(kernel);
-    free(buffer);
+    free(KernelSource);
     clReleaseProgram(program);
     clReleaseCommandQueue(commands);
     clReleaseContext(context);
