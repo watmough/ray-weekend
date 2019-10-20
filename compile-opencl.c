@@ -58,7 +58,7 @@ int get_opencl_context(opencl** pocl) {
     int err=0;
 
     // try and find a GPU
-    if ((err=clGetDeviceIDs(NULL, CL_DEVICE_TYPE_CPU/*GPU*/, 1, &ocl->device_id, NULL))==CL_SUCCESS) {
+    if ((err=clGetDeviceIDs(NULL, CL_DEVICE_TYPE_CPU/*CPU GPU*/, 1, &ocl->device_id, NULL))==CL_SUCCESS) {
         printf("device_id: %ld\n",(long)ocl->device_id);
     } else {
         printf("Error: clGetDeviceIDs returned %ld\n",(long)err);

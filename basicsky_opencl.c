@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <assert.h>
+
 #include "compile-opencl.c"
 
 // definition for drawing space
@@ -74,7 +75,7 @@ int main(int argc, char** argv) {
     clSetKernelArg(kernel, 0, sizeof(cl_mem), &device_draw);
     clSetKernelArg(kernel, 1, sizeof(cl_mem), &device_output);
     clSetKernelArg(kernel, 2, sizeof(unsigned int), &nx);
-    clSetKernelArg(kernel, 3, sizeof(unsigned int), &nx);
+    clSetKernelArg(kernel, 3, sizeof(unsigned int), &ny);
     size_t work_item_count=nx*ny;
     clSetKernelArg(kernel, 4, sizeof(size_t), &work_item_count);
 
