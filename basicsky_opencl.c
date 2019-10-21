@@ -76,8 +76,8 @@ int main(int argc, char** argv) {
     clSetKernelArg(kernel, 1, sizeof(cl_mem), &device_output);
     clSetKernelArg(kernel, 2, sizeof(unsigned int), &nx);
     clSetKernelArg(kernel, 3, sizeof(unsigned int), &ny);
-    size_t work_item_count=nx*ny;
-    clSetKernelArg(kernel, 4, sizeof(size_t), &work_item_count);
+    unsigned int work_item_count=nx*ny;
+    clSetKernelArg(kernel, 4, sizeof(unsigned int), &work_item_count);
 
     // query the work group size for this device_id
     size_t local;
@@ -111,7 +111,11 @@ int main(int argc, char** argv) {
                         host_output, 0, NULL, NULL);
 
     // write out data to ppm file
+#ifndef __APPLE__
+    FILE * out=fopen("/home/jonathan/Development/ray-weekend/image.ppm","w");
+#else
     FILE * out=fopen("/Users/jonathan/Workarea/ray-weekend/image.ppm","w");
+#endif
     assert(out);
     fprintf(out,"P3\n%ld %ld\n255\n",(long)nx,(long)ny);
     for (int j=ny-1; j>=0; j--) {

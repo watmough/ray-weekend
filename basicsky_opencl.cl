@@ -50,3 +50,4 @@ __kernel void basicsky(__global drawspace* draw,
         buffer[y*nx+x]=c;
     }
 }
+
